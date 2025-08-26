@@ -1,0 +1,59 @@
+import re
+
+# 1. Lowercasing
+def to_lowercase(text):
+    return text.lower()
+
+# 2. Removing extra whitespace
+def remove_extra_whitespace(text):
+    return re.sub(r'\s+', ' ', text).strip()
+
+# 3. Handling contractions & <3 symbol
+def handle_contractions(text):
+    text = re.sub(r"can't", "cannot", text)
+    text = re.sub(r"won't", "will not", text)
+    text = re.sub(r"n't", " not", text)
+    text = re.sub(r"'re", " are", text)
+    text = re.sub(r"'s", " is", text)
+    text = re.sub(r"'ll", " will", text)
+    text = re.sub(r"'ve", " have", text)
+    text = re.sub(r"<3", " love ", text)   # convert <3 to "love"
+    return text
+
+# 4. Removing special characters & emojis
+def remove_special_chars(text):
+    return re.sub(r'[^a-zA-Z0-9\s.,!?]', '', text)
+
+# 5. Reducing duplicate letters (soooo → soo, loooong → long)
+def reduce_duplicate_letters(text):
+    return re.sub(r'(.)\1{2,}', r'\1', text)
+
+# 6. Fixing punctuation (!!!! → !, ??? → ?)
+def normalize_punctuation(text):
+    text = re.sub(r'!{2,}', '!', text)
+    text = re.sub(r'\?{2,}', '?', text)
+    text = re.sub(r'\.{2,}', '.', text)
+    return text
+
+# 7. Removing URL artifacts
+def remove_urls(text):
+    return re.sub(r'www\.[a-zA-Z0-9./]+', '', text)
+
+# ---------------- MAIN PIPELINE ----------------
+def clean_text(paragraph):
+    text = to_lowercase(paragraph)
+    text = handle_contractions(text)
+    text = remove_urls(text)
+    text = remove_special_chars(text)
+    text = reduce_duplicate_letters(text)
+    text = normalize_punctuation(text)
+    text = remove_extra_whitespace(text)
+    return text
+
+
+# ------------------- TESTING -------------------
+
+uncleaned = """whoaaaa 😵 this article on AI & ethics issss fireeee!!! i mean, wowww, the way it talks about robotssss takin’ over da world? lollll 😂😂😂 so craaazy! found it at www.robotnews.com//// 4 real, u gotta read ittt!!! @@@ #scarybutcool #futuristicttt"""
+
+print("Original Text:\n", uncleaned, "\n")
+print("Cleaned Text:\n", clean_text(uncleaned))
