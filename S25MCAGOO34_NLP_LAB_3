@@ -1,0 +1,86 @@
+import nltk
+from nltk.corpus import brown, stopwords
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
+from nltk import FreqDist, word_tokenize
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+# Download necessary resources (only first time)
+nltk.download('brown')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+# -------------------------
+# Q1. Load and Tokenize Sentence and Words
+# -------------------------
+
+# Load text from Brown corpus (category = news)
+text = " ".join(brown.words(categories="news"))
+
+# Tokenize into words
+tokens = word_tokenize(text.lower())  # lowercase for uniformity
+print("\nSample Tokens:", tokens[:30])
+
+# -------------------------
+# Q2. Remove Stopwords
+# -------------------------
+
+# Define English stopwords
+stop_words = set(stopwords.words('english'))
+
+# Frequency distribution before stopword removal
+fdist_all = FreqDist(tokens)
+
+# Remove stopwords
+filtered_tokens = [w for w in tokens if w.isalpha() and w not in stop_words]
+fdist_filtered = FreqDist(filtered_tokens)
+
+print("\nTop 20 Words Before Stopword Removal:")
+print(fdist_all.most_common(20))
+
+print("\nTop 20 Words After Stopword Removal:")
+print(fdist_filtered.most_common(20))
+
+# -------------------------
+# Q3. Apply Stemming (Snowball Stemmer)
+# -------------------------
+
+stemmer = SnowballStemmer("english")
+stemmed_words = [stemmer.stem(w) for w in filtered_tokens]
+fdist_stemmed = FreqDist(stemmed_words)
+
+print("\nTop 20 Stemmed Words:")
+print(fdist_stemmed.most_common(20))
+
+# -------------------------
+# Q4. Apply Lemmatization (WordNet Lemmatizer)
+# -------------------------
+
+lemmatizer = WordNetLemmatizer()
+lemmatized_words = [lemmatizer.lemmatize(w) for w in filtered_tokens]
+fdist_lemmatized = FreqDist(lemmatized_words)
+
+print("\nTop 20 Lemmatized Words:")
+print(fdist_lemmatized.most_common(20))
+
+# -------------------------
+# Q5. Word Clouds (Pre/Post Stopword Removal)
+# -------------------------
+
+# Word cloud before stopword removal
+wordcloud_all = WordCloud(width=800, height=400, background_color='white').generate(" ".join(tokens))
+plt.figure(figsize=(10,5))
+plt.title("Word Cloud - Before Stopword Removal")
+plt.imshow(wordcloud_all, interpolation="bilinear")
+plt.axis("off")
+plt.show()
+
+# Word cloud after stopword removal
+wordcloud_filtered = WordCloud(width=800, height=400, background_color='white').generate(" ".join(filtered_tokens))
+plt.figure(figsize=(10,5))
+plt.title("Word Cloud - After Stopword Removal")
+plt.imshow(wordcloud_filtered, interpolation="bilinear")
+plt.axis("off")
+plt.show()
